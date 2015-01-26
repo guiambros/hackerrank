@@ -30,88 +30,33 @@
 # https://www.hackerrank.com/challenges/sherlock-and-queries
 
 
+from heapq import *
 import sys
 DEBUG = True
+fp=open('input01.txt')
+
+M = 1000000007
 
 def print_debug(str):
     if (DEBUG): print "DEBUG: " + str
     return
 
-def read_multiline_input():
-    return(sys.stdin.readlines())
+def read_input():
+    if (DEBUG):
+        ret=map(int, fp.readline().split(' '))
+    else:
+        ret=map(int, sys.stdin.readlines().split(' '))
+    return ret
 
-class sherlock:
-    """A sherlock class"""
-    
-    #@profile
-    def build_matrix_multiplier(self, row_max, B, C):
-        mod_val=10**9+7
-        unique_B = set(B)
-        matrix_multiplier={}        
-
-        # iterate over all the unique B's, and calculate the total multiplier 
-        # for each, using C[row n]*C[row n+1]*C[row n+..]. Store the final
-        # matrix in the dict multi_matrix, which will be used later
-        for b in unique_B:
-            multiplier=1            
-            idx=[i for i, x in enumerate(B) if x==b]
-            for i in idx:
-                multiplier*=C[i]
-            
-            #for row in range(0,row_max):
-            #    if B[row]==b:
-            #        multiplier*=C[row]
-
-            matrix_multiplier[b]=(multiplier%mod_val)
-
-        return matrix_multiplier
-
-
-    #@profile
-    def fast_calc_matrix(self, col_max, row_max, A, B, C):
-        matrix_multi=self.build_matrix_multiplier(row_max, B, C)
-        unique_B = set(B)
-
-        for b in unique_B:
-
-
-        for col in range (0, col_max):
-                if ((col+1)%b)==0:
-                    A[col]*=matrix_multi[b]
-        return A
-
-
-    def calc_matrix(self, N, M, A, B, C):
-        for i in range(0, M):
-            for j in range(0, N):
-                if ((j+1) % B[i])==0:
-                    A[j]=A[j]*C[i]
-        return A
-
-    def print_matrix(self, val):
-        ret = ''
-        for a in val:
-            ret=ret + str(a) + " "
-        print ret.strip()
-        print_debug ("\n---\n\n")
-
-    #@profile
-    def __init__(self):
-        self.vars = []
 
 # ---
 #@profile
-def main(lines=[]):
-    # read input
-    if (len(lines)==0): lines=read_multiline_input()
-    
-    # prepare input data
-    print_debug("line 1: %s" % lines[0])
+def main():
 
-    N, M = map(int, lines[0].split(' '))
-    A = map(int, lines[1].split(' '))
-    B = map(int, lines[2].split(' '))
-    C = map(int, lines[3].split(' '))
+    N, M = read_input()
+    A = read_input()
+    B = read_input()
+    C = read_input()
 
     print_debug("# elements A: %d" % len(A))
     print_debug("# elements B: %d" % len(B))
@@ -119,27 +64,28 @@ def main(lines=[]):
     print_debug("N = %d, M = %d" % (N, M))
 
     # run!
-    slk = sherlock()
+    mps = {}
 
-    if (DEBUG):
-        ret=slk.fast_calc_matrix(N, M, A[:], B[:], C[:])
-        slk.print_matrix(ret)
+    for x, y in zip(B, C):
+        if x not in mps:
+            mps[x] = y
+        else:
+            mps[x] = (mps[x] * y) % M
 
-        ret=slk.calc_matrix(N, M, A[:], B[:], C[:])
-        slk.print_matrix(ret)
+    q = []
 
-    else:
-        ret=slk.fast_calc_matrix(N, M, A, B, C)
-        slk.print_matrix(ret)
+    for k in mps:
+        heappush(q, (k, k, mps[k]))
 
+    while len(q) > 0:
+        ix, k, y = heappop(q)
+        if ix > N:
+            break
+        A[ix - 1] = (A[ix - 1] * y) % M
+        heappush(q, (ix + k, k, y))
+
+    print ' '.join(map(str, A))
     return
 
-
-def test():
-    #test_list = open('sherlock_and_queries_input.txt').read().splitlines()     # expected result: 13 754 2769 1508
-    test_list = open('input13.txt').read().splitlines()     # expected result: 13 754 2769 1508
-    main(test_list)
-
 if __name__ == '__main__':
-    #main()
-    test()
+    main()
