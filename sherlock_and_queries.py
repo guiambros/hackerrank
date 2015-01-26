@@ -6,10 +6,10 @@
 # 
 # Then Watson asks Sherlock to perform the following program:
 # 
-# for i = 1 to M do
-#     for j = 1 to N do
-#         if j % B[i] == 0 then
-#             A[j] = A[j] * C[i]
+# for row = 1 to M do
+#     for col = 1 to N do
+#         if col % B[row] == 0 then
+#             A[col] = A[col] * C[row]
 #         endif
 #     end do
 # 
@@ -25,13 +25,12 @@
 # 
 # OUTPUT
 # Print N integers, the elements of array A after performing the program modulo (10^9+7).
-
+# (a+b)%p = ((a%p)+(b%p))%p
 #
-# https://www.hackerrank.com/challenges/is-fibo
+# https://www.hackerrank.com/challenges/sherlock-and-queries
 
 
 import sys
-from numpy import *
 DEBUG = True
 
 def print_debug(str):
@@ -45,33 +44,56 @@ class sherlock:
     """A sherlock class"""
     
     #@profile
-    def build_matrix_multiplier(B, C):
-        multi_matrix=[] # will have same dimensions as A
+    def build_matrix_multiplier(self, row_max, B, C):
+        mod_val=10**9+7
+        unique_B = set(B)
+        matrix_multiplier={}        
 
-        pass
-        return multi_matrix
+        # iterate over all the unique B's, and calculate the total multiplier 
+        # for each, using C[row n]*C[row n+1]*C[row n+..]. Store the final
+        # matrix in the dict multi_matrix, which will be used later
+        for b in unique_B:
+            multiplier=1            
+            idx=[i for i, x in enumerate(B) if x==b]
+            for i in idx:
+                multiplier*=C[i]
+            
+            #for row in range(0,row_max):
+            #    if B[row]==b:
+            #        multiplier*=C[row]
+
+            matrix_multiplier[b]=(multiplier%mod_val)
+
+        return matrix_multiplier
 
 
     #@profile
-    def calc_matrix(self, col_max, row_max, A, B, C):
-        idx=0
-        for col in range (B[idx]-1, col_max, B[idx]):
-            print_debug ("Processing col %d" % (col+1))
-            for row in range(0, row_max):
-                if ((col+1) % B[row])==0:
-                    A[col]*=C[row]
+    def fast_calc_matrix(self, col_max, row_max, A, B, C):
+        matrix_multi=self.build_matrix_multiplier(row_max, B, C)
+        unique_B = set(B)
+
+        for b in unique_B:
+
+
+        for col in range (0, col_max):
+                if ((col+1)%b)==0:
+                    A[col]*=matrix_multi[b]
+        return A
+
+
+    def calc_matrix(self, N, M, A, B, C):
+        for i in range(0, M):
+            for j in range(0, N):
+                if ((j+1) % B[i])==0:
+                    A[j]=A[j]*C[i]
         return A
 
     def print_matrix(self, val):
-        mod_val=10**9+7
         ret = ''
         for a in val:
-            ret=ret + str(a%mod_val) + " "
-        
-        ret=ret.strip()        
-        print_debug ("Final result = %s" % ret)
-        print_debug ("Num. lines = %d" % len(ret.split(' ')))
-        print_debug ("--Finished!")
+            ret=ret + str(a) + " "
+        print ret.strip()
+        print_debug ("\n---\n\n")
 
     #@profile
     def __init__(self):
@@ -94,22 +116,28 @@ def main(lines=[]):
     print_debug("# elements A: %d" % len(A))
     print_debug("# elements B: %d" % len(B))
     print_debug("# elements C: %d" % len(C))
-
     print_debug("N = %d, M = %d" % (N, M))
-    #print_debug("A = %s" % (A))
-    #print_debug("B = %s" % (B))
-    #print_debug("C = %s" % (C))
-        
+
     # run!
     slk = sherlock()
-    ret=slk.calc_matrix(N, M, A, B, C)
-    slk.print_matrix(ret)
+
+    if (DEBUG):
+        ret=slk.fast_calc_matrix(N, M, A[:], B[:], C[:])
+        slk.print_matrix(ret)
+
+        ret=slk.calc_matrix(N, M, A[:], B[:], C[:])
+        slk.print_matrix(ret)
+
+    else:
+        ret=slk.fast_calc_matrix(N, M, A, B, C)
+        slk.print_matrix(ret)
+
     return
 
-#@profile
+
 def test():
-    test_list = open('sherlock_and_queries_input.txt').read().splitlines()     # expected result: 13 754 2769 1508
-    #test_list = open('input06.txt').read().splitlines()     # expected result: 13 754 2769 1508
+    #test_list = open('sherlock_and_queries_input.txt').read().splitlines()     # expected result: 13 754 2769 1508
+    test_list = open('input13.txt').read().splitlines()     # expected result: 13 754 2769 1508
     main(test_list)
 
 if __name__ == '__main__':
