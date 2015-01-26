@@ -45,29 +45,22 @@ class sherlock:
     """A sherlock class"""
     
     #@profile
-    def calc_matrix(self, N, M, A, B, C):
-        for j in range(0, N, B[i]):
-            mult=1
-            for i in range(0, M):
-                if ((j+1) % B[i])==0:
-                    mult = mult*C[i]
-            print_debug ("Iteration %d" % j)
-            #A = map(lambda x: x*mult, A)
+    def build_matrix_multiplier(B, C):
+        multi_matrix=[] # will have same dimensions as A
 
+        pass
+        return multi_matrix
+
+
+    #@profile
+    def calc_matrix(self, col_max, row_max, A, B, C):
+        idx=0
+        for col in range (B[idx]-1, col_max, B[idx]):
+            print_debug ("Processing col %d" % (col+1))
+            for row in range(0, row_max):
+                if ((col+1) % B[row])==0:
+                    A[col]*=C[row]
         return A
-
-    def special_case_b_equal_1(self, N, M, A, B, C):
-        print_debug("Found special case b=[1,..,1]. Size A: %d" % len(A))
-        mult_vec=[]
-        
-        for i in range(0, M):
-            multiplier = C[i]
-
-            newA = map(lambda x: x*multiplier, A)
-            A = newA
-        print_debug("Size A post-processing: %d" % len(A))
-        return A
-        
 
     def print_matrix(self, val):
         mod_val=10**9+7
@@ -76,6 +69,7 @@ class sherlock:
             ret=ret + str(a%mod_val) + " "
         
         ret=ret.strip()        
+        print_debug ("Final result = %s" % ret)
         print_debug ("Num. lines = %d" % len(ret.split(' ')))
         print_debug ("--Finished!")
 
@@ -108,18 +102,14 @@ def main(lines=[]):
         
     # run!
     slk = sherlock()
-    if (B == M*[1]):
-        ret=slk.calc_matrix(N, M, A, B, C)
-    else:
-        ret=slk.calc_matrix(N, M, A, B, C)
-
+    ret=slk.calc_matrix(N, M, A, B, C)
     slk.print_matrix(ret)
     return
 
 #@profile
 def test():
-    #test_list = open('sherlock_and_queries_input.txt').read().splitlines()     # expected result: 13 754 2769 1508
-    test_list = open('input06.txt').read().splitlines()     # expected result: 13 754 2769 1508
+    test_list = open('sherlock_and_queries_input.txt').read().splitlines()     # expected result: 13 754 2769 1508
+    #test_list = open('input06.txt').read().splitlines()     # expected result: 13 754 2769 1508
     main(test_list)
 
 if __name__ == '__main__':
