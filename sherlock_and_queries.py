@@ -33,9 +33,9 @@
 from heapq import *
 import sys
 DEBUG = True
-fp=open('input01.txt')
+fp=open('sherlock_and_queries_input.txt')
 
-M = 1000000007
+LONGINT = 1000000007
 
 def print_debug(str):
     if (DEBUG): print "DEBUG: " + str
@@ -47,7 +47,6 @@ def read_input():
     else:
         ret=map(int, sys.stdin.readlines().split(' '))
     return ret
-
 
 # ---
 #@profile
@@ -70,7 +69,7 @@ def main():
         if x not in mps:
             mps[x] = y
         else:
-            mps[x] = (mps[x] * y) % M
+            mps[x] = (mps[x] * y) % LONGINT
 
     q = []
 
@@ -81,7 +80,7 @@ def main():
         ix, k, y = heappop(q)
         if ix > N:
             break
-        A[ix - 1] = (A[ix - 1] * y) % M
+        A[ix - 1] = (A[ix - 1] * y) % LONGINT
         heappush(q, (ix + k, k, y))
 
     print ' '.join(map(str, A))
