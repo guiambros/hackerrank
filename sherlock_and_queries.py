@@ -6,10 +6,10 @@
 # 
 # Then Watson asks Sherlock to perform the following program:
 # 
-# for i = 1 to M do
-#     for j = 1 to N do
-#         if j % B[i] == 0 then
-#             A[j] = A[j] * C[i]
+# for row = 1 to M do
+#     for col = 1 to N do
+#         if col % B[row] == 0 then
+#             A[col] = A[col] * C[row]
 #         endif
 #     end do
 # 
@@ -25,18 +25,31 @@
 # 
 # OUTPUT
 # Print N integers, the elements of array A after performing the program modulo (10^9+7).
-
+# (a+b)%p = ((a%p)+(b%p))%p
 #
+<<<<<<< HEAD
 # https://www.hackerrank.com/challenges/sherlock-and-queries/
+=======
+# https://www.hackerrank.com/challenges/sherlock-and-queries
+>>>>>>> HEAD@{6}
 
 
+from heapq import *
 import sys
+<<<<<<< HEAD
 DEBUG = None
+=======
+DEBUG = True
+fp=open('input01.txt')
+
+M = 1000000007
+>>>>>>> HEAD@{6}
 
 def print_debug(str):
     if (DEBUG): print "DEBUG: " + str
     return
 
+<<<<<<< HEAD
 def read_multiline_input():
     return(sys.stdin.readlines())
 
@@ -89,7 +102,53 @@ def main(lines=[]):
 def test():
     test_list = open('sherlock_and_queries_input.txt').read().splitlines()     # expected result: 13 754 2769 1508
     main(test_list)
+=======
+def read_input():
+    if (DEBUG):
+        ret=map(int, fp.readline().split(' '))
+    else:
+        ret=map(int, sys.stdin.readlines().split(' '))
+    return ret
+
+
+# ---
+#@profile
+def main():
+
+    N, M = read_input()
+    A = read_input()
+    B = read_input()
+    C = read_input()
+
+    print_debug("# elements A: %d" % len(A))
+    print_debug("# elements B: %d" % len(B))
+    print_debug("# elements C: %d" % len(C))
+    print_debug("N = %d, M = %d" % (N, M))
+
+    # run!
+    mps = {}
+
+    for x, y in zip(B, C):
+        if x not in mps:
+            mps[x] = y
+        else:
+            mps[x] = (mps[x] * y) % M
+
+    q = []
+
+    for k in mps:
+        heappush(q, (k, k, mps[k]))
+
+    while len(q) > 0:
+        ix, k, y = heappop(q)
+        if ix > N:
+            break
+        A[ix - 1] = (A[ix - 1] * y) % M
+        heappush(q, (ix + k, k, y))
+
+    print ' '.join(map(str, A))
+    return
+>>>>>>> HEAD@{6}
 
 if __name__ == '__main__':
-    #main()
-    test()
+    main()
