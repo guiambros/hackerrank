@@ -33,7 +33,7 @@
 from heapq import *
 import sys
 DEBUG = True
-fp=open('sherlock_and_queries_input.txt')
+fp=open('input09.txt')
 
 LONGINT = 1000000007
 
