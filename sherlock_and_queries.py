@@ -27,89 +27,26 @@
 # Print N integers, the elements of array A after performing the program modulo (10^9+7).
 # (a+b)%p = ((a%p)+(b%p))%p
 #
-<<<<<<< HEAD
-# https://www.hackerrank.com/challenges/sherlock-and-queries/
-=======
 # https://www.hackerrank.com/challenges/sherlock-and-queries
->>>>>>> HEAD@{6}
 
 
 from heapq import *
 import sys
-<<<<<<< HEAD
-DEBUG = None
-=======
 DEBUG = True
-fp=open('input01.txt')
+fp=open('sherlock_and_queries_input.txt')
 
-M = 1000000007
->>>>>>> HEAD@{6}
+LONGINT = 1000000007
 
 def print_debug(str):
     if (DEBUG): print "DEBUG: " + str
     return
 
-<<<<<<< HEAD
-def read_multiline_input():
-    return(sys.stdin.readlines())
-
-class sherlock:
-    """A sherlock class"""
-    
-    #@profile
-    def calc_matrix(self, N, M, A, B, C):
-        for i in range(0, M):
-            for j in range(0, N):
-                if ((j+1) % B[i])==0:
-                    A[j]=A[j]*C[i]
-        return A
-
-    def print_matrix(self, val):
-        mod_val=10**9+7
-        ret = ''
-        for a in val:
-            ret=ret + str(a%mod_val) + " "
-        print ret.strip()
-
-    #@profile
-    def __init__(self):
-        self.vars = []
-
-# ---
-#@profile
-def main(lines=[]):
-    # read input
-    if (len(lines)==0): lines=read_multiline_input()
-    
-    # prepare input data
-    N, M = map(int, lines[0].split(' '))
-    A = map(int, lines[1].split(' '))
-    B = map(int, lines[2].split(' '))
-    C = map(int, lines[3].split(' '))
-
-    print_debug("N = %d, M = %d" % (N, M))
-    print_debug("A = %s" % (A))
-    print_debug("B = %s" % (B))
-    print_debug("C = %s" % (C))
-        
-    # run!
-    slk = sherlock()
-    ret = slk.calc_matrix(N, M, A, B, C)
-    slk.print_matrix(ret)
-    return
-
-#@profile
-def test():
-    test_list = open('sherlock_and_queries_input.txt').read().splitlines()     # expected result: 13 754 2769 1508
-    main(test_list)
-=======
 def read_input():
     if (DEBUG):
         ret=map(int, fp.readline().split(' '))
     else:
         ret=map(int, sys.stdin.readlines().split(' '))
     return ret
-
 
 # ---
 #@profile
@@ -132,7 +69,7 @@ def main():
         if x not in mps:
             mps[x] = y
         else:
-            mps[x] = (mps[x] * y) % M
+            mps[x] = (mps[x] * y) % LONGINT
 
     q = []
 
@@ -143,12 +80,11 @@ def main():
         ix, k, y = heappop(q)
         if ix > N:
             break
-        A[ix - 1] = (A[ix - 1] * y) % M
+        A[ix - 1] = (A[ix - 1] * y) % LONGINT
         heappush(q, (ix + k, k, y))
 
     print ' '.join(map(str, A))
     return
->>>>>>> HEAD@{6}
 
 if __name__ == '__main__':
     main()
