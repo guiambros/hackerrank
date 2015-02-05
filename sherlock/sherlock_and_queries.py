@@ -1,8 +1,8 @@
  #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 #
-# Watson gives to Sherlock an array: A1,A2,,AN. He also gives to Sherlock two
-# other arrays: B1,B2,,BM and C1,C2,,CM.
+# Watson gives to Sherlock an array: A1,A2,⋯,AN. He also gives to Sherlock two
+# other arrays: B1,B2,⋯,BM and C1,C2,⋯,CM.
 # 
 # Then Watson asks Sherlock to perform the following program:
 # 
@@ -29,12 +29,12 @@
 # https://www.hackerrank.com/challenges/sherlock-and-queries
 
 
-from heapq import *
 import sys
-DEBUG = True
-fp=open('input09.txt')
 
+DEBUG = False
 LONGINT = 1000000007
+
+if (DEBUG): fp=open('input15.txt')
 
 def print_debug(str):
     if (DEBUG): print "DEBUG: " + str
@@ -44,7 +44,7 @@ def read_input():
     if (DEBUG):
         ret=map(int, fp.readline().split(' '))
     else:
-        ret=map(int, sys.stdin.readlines().split(' '))
+        ret=map(int, sys.stdin.readline().split(' '))
     return ret
 
 def main():
@@ -53,34 +53,114 @@ def main():
     B = read_input()
     C = read_input()
 
-    print_debug("# elements A: %d" % len(A))
-    print_debug("# elements B: %d" % len(B))
-    print_debug("# elements C: %d" % len(C))
-    print_debug("N = %d, M = %d" % (N, M))
+    # Example:
+    #   A=[3,4]
+    #   B=[1,1,2]
+    #   C=[10,20,30]
+    #
+    # Naive algo:
+    #  i = 1:3
+    #    j = 1:2
+    #       if j%B[i] then A[j] *= C[i]
+    #
+    #   i   j  B[i]  C[i]   j%B   A[j*]
+    #  -----------------------------------
+    #   1   1    1    10     Y    3*10
+    #   1   2    1    10     Y    4*20
+    #   2   1    1    20     Y    (3*10)*20
+    #   2   2    1    20     Y    (4*20)*20
+    #   3   1    2    30     -    ==
+    #   3   2    2    30     Y    ((4*20)*20)*30
+    #
+    # Res:  A[1]=(3*10)*20=600  A[2]=((4*20)*20)*30=48000
+    #
+    
+    # Solutions Approach:
+    # 1. Pre-calculate a multiplication matrix. Basically a hashtable where each B(i) is unique
+    # 2. Put all the elements of the multiplication matrix in a Set
+    # 3. Iterate over each element of B, finding the elements of A that need to be multiplied.
+    # 
+    # More specifically:
+    # 
+    # Matrix:                                 B[i]
+    #   1: 10*20 = 200                   j  |  1      2     3      4      5
+    #   2: = 30                         --------------------------------------
+    #                                    1  |  MM1
+    # Meaning:                           2  |  MM1   MM2
+    #   if j is divisible by 1, *200     3  |  MM1         MM3
+    #   if divisible by 2, *30           4  |  MM1   MM2          MM4 
+    #   if divisible by BOTH, *30*200    5  |  MM1                       MM5
+    # 
+    # Note that if your matrix multiplication is in ascending order, you just need to go till 
+    # j(max). After that you'll never have j%B[i] == 0, and you should break the loop
+    # 
+    # Items 1 and 2 above are straightforward. For #3, on every A[j] where j is divisible by 2
+    # (2, 4, 6, 8, 10, ...) should be multiplied by 30.
+    # 
+    # There are two ways of addressing this: 1) a queue, where we apply the multiplier to A[j], 
+    # and push the next increment back in the queue. For example, for j=2, we multiply A[2] *= 30,
+    # and push 4 to the queue (then 6, 8, and so on). Once j > N, we stop.
+    #
+    # A second (and more obvious) method is to use an outer loop for the divisible operands, and an
+    # inner loop for the increments. Much simpler, less code, no queue or anything. This is also
+    # 5x faster than method 1 (7.9s vs. 1.46s, using input15.txt)
+    #
 
-    # run!
-    mps = {}
+    mtx = build_matrix_multiplier(B, C)
+    #method1(mtx, A[:], N)
+    method2(mtx, A[:], N)
 
-    for x, y in zip(B, C):
-        if x not in mps:
-            mps[x] = y
-        else:
-            mps[x] = (mps[x] * y) % LONGINT
-
+#@profile
+def method1(mtx, A, N):
+    from heapq import *
     q = []
+    
+    for b, multiplier in mtx.items():
+        heappush(q, (b, multiplier, b))
 
-    for k in mps:
-        heappush(q, (k, k, mps[k]))
-
-    while len(q) > 0:
-        ix, k, y = heappop(q)
-        if ix > N:
+    idx=1
+    while len(q)>0:
+        idx,mm,inc = heappop(q)
+        if idx>N:
             break
-        A[ix - 1] = (A[ix - 1] * y) % LONGINT
-        heappush(q, (ix + k, k, y))
+        A[idx-1] = (A[idx-1] * mm) % LONGINT
+        heappush(q, (idx+inc,mm,inc))        
 
-    print ' '.join(map(str, A))
-    return
+    if (not DEBUG): print ' '.join(map(str, A))
+    
+#@profile
+def method2(mtx, A, N):
+    for b, multiplier in mtx.items():
+        for i in xrange(b, N+1, b):
+            A[i-1] = (A[i-1] * multiplier) % LONGINT
+    
+    if (not DEBUG): print ' '.join(map(str, A))
+
+
+def build_matrix_multiplier(B, C):
+    ''' Build the matrix of multipliers. For each *unique* elements in B, calculate
+        the equivalent multiplier.
+
+        This means that: for every number i where i % B[i] == 0, the multiplier
+        is *= C[i]. In other words, suppose you have:
+            B = 1, 1, 2, 4, 5
+            C = 10, 20, 30, 40, 50
+
+         idx divisible          mutliply A[i]
+         by...:                 by:
+            1                       x200
+            2                       x30
+            4                       x40
+            5                       x50
+    '''
+    matrix={}
+    for b, c in zip(B, C):
+        if b not in matrix:
+            matrix[b] = c
+        else:
+            matrix[b] = (matrix[b]*c) % LONGINT
+    return matrix
+
 
 if __name__ == '__main__':
     main()
