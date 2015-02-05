@@ -6,13 +6,12 @@
 # 
 # Then Watson asks Sherlock to perform the following program:
 # 
-# for row = 1 to M do
-#     for col = 1 to N do
-#         if col % B[row] == 0 then
-#             A[col] = A[col] * C[row]
+# for i = 1 to M do
+#     for j = 1 to N do
+#         if j % B[i] == 0 then
+#             A[j] = A[j] * C[i]
 #         endif
 #     end do
-# 
 # end do
 # 
 # Can you help Sherlock and tell him the resulting array A? You should print all
@@ -48,10 +47,7 @@ def read_input():
         ret=map(int, sys.stdin.readlines().split(' '))
     return ret
 
-# ---
-#@profile
 def main():
-
     N, M = read_input()
     A = read_input()
     B = read_input()
