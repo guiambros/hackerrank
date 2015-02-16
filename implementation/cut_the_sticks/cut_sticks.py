@@ -37,7 +37,7 @@
 #
 import sys
 
-DEBUG = False
+DEBUG = True
 
 if (DEBUG): fp=open('input-b.txt')
 
@@ -74,5 +74,18 @@ def main():
         cut_len = min(sticks)        
         sticks[:] = [s_len-cut_len for s_len in sticks]
 
+# Alternative solution, by Coltin Caverhill (@Coltin)
+def solve():
+    nSticks = int(read_input()[0])
+    stickLengths = sorted(read_input())
+    cuts = 0
+    totalCutLength = 0
+    i = 0
+    while i < len(stickLengths):
+        print len(stickLengths)-i
+        totalCutLength = stickLengths[i]
+        while i < len(stickLengths) and stickLengths[i] <= totalCutLength:
+            i += 1
+
 if __name__ == '__main__':
-    main()
+    solve()
