@@ -30,16 +30,16 @@ def quicksort(a):
     if len(a) < 2:
         return a
     pv = a[0]
-    left, right = partition(pv, a[1:])
+    left, right = partition(a)
     l = quicksort(left)
     r = quicksort(right)
     ret = l + [pv] + r
     print_array(ret)
     return ret
 
-
-
-def partition(p, array):
+def partition(a):
+    p = a[0]
+    array = a[1:]
     right, left = [], []
     for i in array:
         if i>p:
@@ -47,7 +47,6 @@ def partition(p, array):
         else:
             left.append(i)    
     return(left, right)
-
 
 if __name__ == '__main__':
     main()
